@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Educativo</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom, #c5e08d 50%, transparent 50%),
+                        url('../img/fondo.jpg');
+            background-size: 100% 100%, 100% 70%;
+            background-position: top, bottom;
+            background-repeat: no-repeat;
+        }
+
+        .login-card {
+            background: #fffb96;
+            width: 350px;
+            padding: 40px 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .profile-circle {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 30px auto;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            margin-top: 5px;
+            outline: none;
+        }
+
+        .login-btn {
+            margin-top: 20px;
+            background: #69d44f;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Estilos personalizados para la alerta */
+        .my-swal-popup {
+            border-radius: 25px !important;
+            padding: 2em !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <div class="profile-circle"></div>
+
+        <div class="input-group">
+            <label>Usuario</label>
+            <input id="usuario" type="text">
+        </div>
+
+        <div class="input-group">
+            <label>Contraseña</label>
+            <input id="password" type="password">
+        </div>
+
+        <button class="login-btn" onclick="login()">Iniciar sesión</button>
+    </div>
+
+    <script>
+        async function login() {
+            const usuario = document.getElementById("usuario").value;
+            const password = document.getElementById("password").value;
+
+            const formData = new FormData();
+            formData.append("usuario", usuario);
+            formData.append("password", password);
+
+            try {
+                const response = await fetch("../backend/login.php", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = "dashboard.html";
+                } else {
+                    // AQUÍ ESTÁ EL CAMBIO: Quitamos el alert() y dejamos solo SweetAlert
+                    Swal.fire({
+                        title: '¡Ups!',
+                        text: 'Usuario o contraseña incorrectos',
+                        icon: 'error',
+                        confirmButtonText: 'Reintentar',
+                        confirmButtonColor: '#69d44f', // El verde de tu botón
+                        background: '#ffffff',
+                        customClass: {
+                            popup: 'my-swal-popup'
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+    </script>
+</body>
+</html>

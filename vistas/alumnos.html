@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Gestión Académica</title>
+
+<style>
+
+:root{
+--primary:#2563eb;
+--bg:#f1f5f9;
+--card:#ffffff;
+--text:#334155;
+--text-light:#64748b;
+--border:#e2e8f0;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:var(--bg);
+display:flex;
+min-height:100vh;
+}
+
+.sidebar{
+width:350px;
+background:white;
+padding:30px;
+border-right:1px solid var(--border);
+position:fixed;
+height:100%;
+}
+
+.sidebar h2{
+color:var(--primary);
+margin-bottom:20px;
+}
+
+.form-group{
+margin-bottom:15px;
+}
+
+label{
+font-size:12px;
+font-weight:bold;
+color:var(--text-light);
+}
+
+input{
+width:100%;
+padding:10px;
+border:1px solid var(--border);
+border-radius:6px;
+margin-top:5px;
+}
+
+.btn-main{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+background:var(--primary);
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.main-content{
+margin-left:350px;
+padding:40px;
+flex:1;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:white;
+border-radius:10px;
+overflow:hidden;
+}
+
+th{
+background:#f8fafc;
+padding:15px;
+text-align:left;
+font-size:12px;
+}
+
+td{
+padding:15px;
+border-bottom:1px solid var(--border);
+}
+
+button{
+padding:6px 10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+.btn-delete{
+background:#ef4444;
+color:white;
+}
+
+.btn-edit{
+background:#22c55e;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+<h2>Registrar Alumno</h2>
+
+<div class="form-group">
+<label>Nombre</label>
+<input id="nombre">
+</div>
+
+<div class="form-group">
+<label>Matrícula</label>
+<input id="matricula">
+</div>
+
+<div class="form-group">
+<label>Correo</label>
+<input id="correo">
+</div>
+
+<button class="btn-main" onclick="guardarAlumno()">Registrar</button>
+
+</aside>
+
+<main class="main-content">
+
+<h1>Lista de Alumnos</h1>
+
+<br>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Nombre</th>
+<th>Matrícula</th>
+<th>Correo</th>
+<th>Acciones</th>
+</tr>
+</thead>
+
+<tbody id="tablaAlumnos"></tbody>
+
+</table>
+
+</main>
+
+<script>
+
+async function cargarAlumnos(){
+
+const response = await fetch("../backend/alumnos.php")
+const data = await response.json()
+
+const tabla = document.getElementById("tablaAlumnos")
+tabla.innerHTML=""
+
+data.forEach(alumno =>{
+
+tabla.innerHTML+=`
+<tr>
+
+<td>${alumno.id_alumno}</td>
+<td>${alumno.nombre}</td>
+<td>${alumno.matricula}</td>
+<td>${alumno.correo}</td>
+
+<td>
+<button class="btn-delete" onclick="eliminarAlumno(${alumno.id_alumno})">Eliminar</button>
+</td>
+
+</tr>
+`
+
+})
+
+}
+
+async function guardarAlumno(){
+
+const nombre = document.getElementById("nombre").value
+const matricula = document.getElementById("matricula").value
+const correo = document.getElementById("correo").value
+
+const formData = new FormData()
+
+formData.append("nombre",nombre)
+formData.append("matricula",matricula)
+formData.append("correo",correo)
+
+await fetch("../backend/alumnos.php",{
+method:"POST",
+body:formData
+})
+
+limpiar()
+cargarAlumnos()
+
+}
+
+async function eliminarAlumno(id){
+
+if(confirm("¿Eliminar alumno?")){
+
+await fetch("../backend/alumnos.php?id="+id,{
+method:"DELETE"
+})
+
+cargarAlumnos()
+
+}
+
+}
+
+function limpiar(){
+
+document.getElementById("nombre").value=""
+document.getElementById("matricula").value=""
+document.getElementById("correo").value=""
+
+}
+
+cargarAlumnos()
+
+</script>
+
+</body>
+</html>

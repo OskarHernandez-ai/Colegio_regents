@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control | Sistema Escolar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            /* Colores de las secciones */
+            --color-alumnos: #2563eb;
+            --color-maestros: #10b981;
+            --color-materias: #a855f7;
+            --color-grupos: #0ea5e9;
+            --color-inscripciones: #f59e0b;
+            --color-calificaciones: #db2777;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER MODERNO */
+        .header {
+            background: #ffffff;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .logout-btn {
+            background: #f1f5f9;
+            color: #ef4444;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #fee2e2;
+            transform: translateY(-1px);
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* GRID DE TARJETAS */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 280px);
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: transparent;
+        }
+
+        /* Iconos o indicadores de color */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Colores específicos por tarjeta */
+        .card-alumnos::before { background: var(--color-alumnos); }
+        .card-alumnos h3 { color: var(--color-alumnos); }
+
+        .card-maestros::before { background: var(--color-maestros); }
+        .card-maestros h3 { color: var(--color-maestros); }
+
+        .card-materias::before { background: var(--color-materias); }
+        .card-materias h3 { color: var(--color-materias); }
+
+        .card-grupos::before { background: var(--color-grupos); }
+        .card-grupos h3 { color: var(--color-grupos); }
+
+        .card-inscripciones::before { background: var(--color-inscripciones); }
+        .card-inscripciones h3 { color: var(--color-inscripciones); }
+
+        .card-calificaciones::before { background: var(--color-calificaciones); }
+        .card-calificaciones h3 { color: var(--color-calificaciones); }
+
+        /* Responsive */
+        @media (max-width: 950px) {
+            .cards-grid { grid-template-columns: repeat(2, 280px); }
+        }
+
+        @media (max-width: 650px) {
+            .cards-grid { grid-template-columns: 1fr; }
+            .header { padding: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="header-title">
+            <h1>Sistema Escolar Pro</h1>
+            <p>Panel de Administración</p>
+        </div>
+        <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+    </header>
+
+    <main class="container">
+        <div class="welcome-section">
+            <h2>Bienvenido de nuevo</h2>
+            <p>¿Qué gestión deseas realizar hoy?</p>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card card-alumnos" onclick="location.href='alumnos.html'">
+                <h3>Alumnos</h3>
+                <p>Gestión de expedientes, matrículas y datos de contacto.</p>
+            </div>
+
+            <div class="card card-maestros" onclick="location.href='maestros.html'">
+                <h3>Maestros</h3>
+                <p>Registro de plantilla docente y asignación de correos.</p>
+            </div>
+
+            <div class="card card-materias" onclick="location.href='materias.html'">
+                <h3>Materias</h3>
+                <p>Configuración del catálogo de asignaturas del plan de estudios.</p>
+            </div>
+
+            <div class="card card-grupos" onclick="location.href='grupos.html'">
+                <h3>Grupos</h3>
+                <p>Organización de grupos por cuatrimestre y periodo.</p>
+            </div>
+
+            <div class="card card-inscripciones" onclick="location.href='inscripciones.html'">
+                <h3>Inscripciones</h3>
+                <p>Vinculación de alumnos con sus respectivas materias.</p>
+            </div>
+
+            <div class="card card-calificaciones" onclick="location.href='calificaciones.html'">
+                <h3>Calificaciones</h3>
+                <p>Carga de parciales y cálculo automático de promedios.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function logout(){
+            if(confirm("¿Seguro que deseas salir del sistema?")) {
+                window.location="login.html";
+            }
+        }
+    </script>
+
+</body>
+</html>

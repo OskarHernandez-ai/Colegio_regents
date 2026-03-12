@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calificaciones | Sistema Académico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #9d174d; /* Rosa/Rojo vino profundo */
+            --accent: #db2777;  /* Rosa vibrante */
+            --bg: #fff1f2;      /* Fondo muy tenue rosado */
+            --card: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 350px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 40px 25px;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.03);
+            z-index: 10;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            background: #f9fafb;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: #831843;
+            transform: translateY(-1px);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 350px;
+            flex: 1;
+            padding: 50px 40px;
+        }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* TABLA */
+        .table-card {
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #fdf2f8;
+            padding: 16px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid #f9fafb;
+            font-size: 0.9rem;
+        }
+
+        .promedio-badge {
+            background: #be185d;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .score-box {
+            font-weight: 600;
+            color: var(--text-main);
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            min-width: 35px;
+        }
+
+        /* BOTONES ACCION */
+        .btn-action {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .edit { background: #dbeafe; color: #1e40af; }
+        .delete { background: #fee2e2; color: #b91c1c; }
+
+        @media (max-width: 1000px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; position: relative; height: auto; border-right: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <h2 id="form-title">Evaluar</h2>
+        
+        <div class="form-group">
+            <label>Alumno y Materia</label>
+            <select id="inscripcion"></select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+                <label>P1</label>
+                <input id="p1" type="number" step="0.1" placeholder="0.0">
+            </div>
+            <div class="form-group">
+                <label>P2</label>
+                <input id="p2" type="number" step="0.1" placeholder="0.0">
+            </div>
+            <div class="form-group">
+                <label>P3</label>
+                <input id="p3" type="number" step="0.1" placeholder="0.0">
+            </div>
+        </div>
+
+        <button class="btn-save" onclick="guardar()">Guardar Calificación</button>
+        <p id="edit-tag" style="display:none; color: var(--accent); font-size: 11px; margin-top: 10px; font-weight: 600; text-align: center;">
+            MODO EDICIÓN ACTIVADO
+        </p>
+    </aside>
+
+    <main class="main-content">
+        <header class="header-flex">
+            <h1>Registro de Calificaciones</h1>
+            <a href="dashboard.html" class="btn-back">← Menú Principal</a>
+        </header>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Alumno</th>
+                        <th>Materia</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                        <th>P3</th>
+                        <th>Promedio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        let editando = false;
+        let idEditar = null;
+
+        async function cargarInscripciones(){
+            const response = await fetch("http://localhost:3000/inscripciones");
+            const data = await response.json();
+            const select = document.getElementById("inscripcion");
+            select.innerHTML = "";
+            data.forEach(i => {
+                select.innerHTML += `<option value="${i.id_alumno_materia}">${i.alumno} - ${i.materia}</option>`;
+            });
+        }
+
+        async function cargarCalificaciones(){
+            const response = await fetch("http://localhost:3000/calificaciones");
+            const data = await response.json();
+            const tabla = document.getElementById("tabla");
+            tabla.innerHTML = "";
+
+            data.forEach(c => {
+                tabla.innerHTML += `
+                <tr>
+                    <td style="text-align: left; font-weight: 600;">${c.alumno}</td>
+                    <td style="text-align: left; color: var(--text-muted);">${c.materia}</td>
+                    <td><span class="score-box">${c.parcial1}</span></td>
+                    <td><span class="score-box">${c.parcial2}</span></td>
+                    <td><span class="score-box">${c.parcial3}</span></td>
+                    <td><span class="promedio-badge">${c.promedio}</span></td>
+                    <td>
+                        <button class="btn-action edit" onclick="editar(${c.id_calificacion},${c.parcial1},${c.parcial2},${c.parcial3})">Editar</button>
+                        <button class="btn-action delete" onclick="eliminar(${c.id_calificacion})">Eliminar</button>
+                    </td>
+                </tr>
+                `;
+            });
+        }
+
+        async function guardar(){
+            const id_alumno_materia = document.getElementById("inscripcion").value;
+            const p1 = parseFloat(document.getElementById("p1").value) || 0;
+            const p2 = parseFloat(document.getElementById("p2").value) || 0;
+            const p3 = parseFloat(document.getElementById("p3").value) || 0;
+            const promedio = ((p1 + p2 + p3) / 3).toFixed(2);
+
+            const url = editando ? `http://localhost:3000/calificaciones/${idEditar}` : "http://localhost:3000/calificaciones";
+            const method = editando ? "PUT" : "POST";
+
+            await fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id_alumno_materia, parcial1: p1, parcial2: p2, parcial3: p3, promedio })
+            });
+
+            editando = false;
+            idEditar = null;
+            document.getElementById("form-title").innerText = "Evaluar";
+            document.getElementById("edit-tag").style.display = "none";
+            limpiar();
+            cargarCalificaciones();
+        }
+
+        function editar(id, p1, p2, p3){
+            document.getElementById("p1").value = p1;
+            document.getElementById("p2").value = p2;
+            document.getElementById("p3").value = p3;
+            editando = true;
+            idEditar = id;
+            document.getElementById("form-title").innerText = "Editar Notas";
+            document.getElementById("edit-tag").style.display = "block";
+        }
+
+        async function eliminar(id){
+            if(confirm("¿Eliminar esta calificación?")) {
+                await fetch(`http://localhost:3000/calificaciones/${id}`, { method: "DELETE" });
+                cargarCalificaciones();
+            }
+        }
+
+        function limpiar(){
+            document.getElementById("p1").value = "";
+            document.getElementById("p2").value = "";
+            document.getElementById("p3").value = "";
+        }
+
+        cargarInscripciones();
+        cargarCalificaciones();
+    </script>
+</body>
+</html>

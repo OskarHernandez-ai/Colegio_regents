@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripciones | Control Académico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #9a3412; /* Naranja quemado profesional */
+            --accent: #f59e0b;  /* Ámbar para inscripciones */
+            --bg: #fdfaf9;      /* Fondo ligeramente cálido */
+            --card: #ffffff;
+            --text-main: #1c1917;
+            --text-muted: #78716c;
+            --border: #e7e5e4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 350px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 40px 25px;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.02);
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: #fafaf9;
+            cursor: pointer;
+            transition: all 0.2s;
+            appearance: none; /* Quita el estilo por defecto */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2378716c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        }
+
+        .btn-enroll {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-enroll:hover {
+            background: #7c2d12;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(154, 52, 18, 0.2);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 350px;
+            flex: 1;
+            padding: 50px 60px;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .back-link:hover { background: #f5f5f4; color: var(--text-main); }
+
+        /* TABLA */
+        .table-card {
+            background: var(--card);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #fafaf9;
+            padding: 16px 24px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        .student-cell { font-weight: 600; color: var(--text-main); }
+        .subject-cell { color: var(--primary); font-weight: 500; }
+
+        .id-badge {
+            font-family: monospace;
+            color: #a8a29e;
+            font-size: 0.85rem;
+        }
+
+        .btn-delete {
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #e11d48;
+            color: white;
+        }
+
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; position: relative; height: auto; border-right: none; }
+            .main-content { margin-left: 0; padding: 30px 20px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <h2>Inscripciones</h2>
+        
+        <div class="form-group">
+            <label>Seleccionar Alumno</label>
+            <select id="alumno">
+                <option value="" disabled selected>Elegir alumno...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Seleccionar Materia</label>
+            <select id="materia">
+                <option value="" disabled selected>Elegir materia...</option>
+            </select>
+        </div>
+
+        <button class="btn-enroll" onclick="guardarInscripcion()">Confirmar Inscripción</button>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-nav">
+            <h1>Registro de Inscritos</h1>
+            <a href="dashboard.html" class="back-link">← Volver al Sistema</a>
+        </header>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Ref</th>
+                        <th>Alumno</th>
+                        <th>Materia Asignada</th>
+                        <th width="120">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaInscripciones">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        async function cargarAlumnos(){
+            const response = await fetch("http://localhost:3000/alumnos");
+            const data = await response.json();
+            const select = document.getElementById("alumno");
+            data.forEach(a => {
+                select.innerHTML += `<option value="${a.id_alumno}">${a.nombre}</option>`;
+            });
+        }
+
+        async function cargarMaterias(){
+            const response = await fetch("http://localhost:3000/materias");
+            const data = await response.json();
+            const select = document.getElementById("materia");
+            data.forEach(m => {
+                select.innerHTML += `<option value="${m.id_materia}">${m.nombre_materia}</option>`;
+            });
+        }
+
+        async function cargarInscripciones(){
+            try {
+                const response = await fetch("http://localhost:3000/inscripciones");
+                const data = await response.json();
+                const tabla = document.getElementById("tablaInscripciones");
+                tabla.innerHTML = "";
+
+                data.forEach(i => {
+                    tabla.innerHTML += `
+                    <tr>
+                        <td><span class="id-badge">#${i.id_alumno_materia}</span></td>
+                        <td class="student-cell">${i.alumno}</td>
+                        <td class="subject-cell">${i.materia}</td>
+                        <td>
+                            <button class="btn-delete" onclick="eliminarInscripcion(${i.id_alumno_materia})">Dar de baja</button>
+                        </td>
+                    </tr>
+                    `;
+                });
+            } catch (e) { console.error("Error cargando inscripciones", e); }
+        }
+
+        async function guardarInscripcion(){
+            const id_alumno = document.getElementById("alumno").value;
+            const id_materia = document.getElementById("materia").value;
+
+            if(!id_alumno || !id_materia) return alert("Selecciona ambos campos");
+
+            await fetch("http://localhost:3000/inscripciones", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id_alumno, id_materia })
+            });
+
+            // Limpiar selects
+            document.getElementById("alumno").selectedIndex = 0;
+            document.getElementById("materia").selectedIndex = 0;
+            
+            cargarInscripciones();
+        }
+
+        async function eliminarInscripcion(id){
+            if(confirm("¿Seguro que deseas eliminar esta inscripción?")) {
+                await fetch(`http://localhost:3000/inscripciones/${id}`, { method: "DELETE" });
+                cargarInscripciones();
+            }
+        }
+
+        cargarAlumnos();
+        cargarMaterias();
+        cargarInscripciones();
+    </script>
+</body>
+</html>

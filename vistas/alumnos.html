@@ -6,244 +6,175 @@
 <title>Sistema de Gestión Académica</title>
 
 <style>
+    :root{
+        --primary:#2563eb;
+        --bg:#f1f5f9;
+        --card:#ffffff;
+        --text:#334155;
+        --text-light:#64748b;
+        --border:#e2e8f0;
+    }
 
-:root{
---primary:#2563eb;
---bg:#f1f5f9;
---card:#ffffff;
---text:#334155;
---text-light:#64748b;
---border:#e2e8f0;
-}
+    *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial;
-}
+    body{ background:var(--bg); display:flex; min-height:100vh; }
 
-body{
-background:var(--bg);
-display:flex;
-min-height:100vh;
-}
+    .sidebar{
+        width:350px;
+        background:white;
+        padding:30px;
+        border-right:1px solid var(--border);
+        position:fixed;
+        height:100%;
+    }
 
-.sidebar{
-width:350px;
-background:white;
-padding:30px;
-border-right:1px solid var(--border);
-position:fixed;
-height:100%;
-}
+    .sidebar h2{ color:var(--primary); margin-bottom:20px; }
 
-.sidebar h2{
-color:var(--primary);
-margin-bottom:20px;
-}
+    .form-group{ margin-bottom:15px; }
 
-.form-group{
-margin-bottom:15px;
-}
+    label{ font-size:12px; font-weight:bold; color:var(--text-light); }
 
-label{
-font-size:12px;
-font-weight:bold;
-color:var(--text-light);
-}
+    input{
+        width:100%;
+        padding:10px;
+        border:1px solid var(--border);
+        border-radius:6px;
+        margin-top:5px;
+    }
 
-input{
-width:100%;
-padding:10px;
-border:1px solid var(--border);
-border-radius:6px;
-margin-top:5px;
-}
+    .btn-save{
+        width:100%;
+        padding:12px;
+        background:var(--primary);
+        color:white;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;
+        font-weight:bold;
+        margin-top:10px;
+    }
 
-.btn-main{
-width:100%;
-padding:12px;
-margin-top:15px;
-border:none;
-background:var(--primary);
-color:white;
-border-radius:6px;
-cursor:pointer;
-}
+    main{ margin-left:350px; padding:40px; width:100%; }
 
-.main-content{
-margin-left:350px;
-padding:40px;
-flex:1;
-}
+    table{
+        width:100%;
+        background:white;
+        border-collapse:collapse;
+        border-radius:8px;
+        overflow:hidden;
+        box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-background:white;
-border-radius:10px;
-overflow:hidden;
-}
+    th, td{ padding:15px; text-align:left; border-bottom:1px solid var(--border); }
 
-th{
-background:#f8fafc;
-padding:15px;
-text-align:left;
-font-size:12px;
-}
+    th{ background:#f8fafc; color:var(--text-light); font-size:13px; text-transform:uppercase; }
 
-td{
-padding:15px;
-border-bottom:1px solid var(--border);
-}
-
-button{
-padding:6px 10px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-
-.btn-delete{
-background:#ef4444;
-color:white;
-}
-
-.btn-edit{
-background:#22c55e;
-color:white;
-}
-
+    .btn-delete{
+        background:#fee2e2;
+        color:#ef4444;
+        border:none;
+        padding:6px 12px;
+        border-radius:4px;
+        cursor:pointer;
+        font-size:12px;
+    }
 </style>
 </head>
-
 <body>
 
 <aside class="sidebar">
-
-<h2>Registrar Alumno</h2>
-
-<div class="form-group">
-<label>Nombre</label>
-<input id="nombre">
-</div>
-
-<div class="form-group">
-<label>Matrícula</label>
-<input id="matricula">
-</div>
-
-<div class="form-group">
-<label>Correo</label>
-<input id="correo">
-</div>
-
-<button class="btn-main" onclick="guardarAlumno()">Registrar</button>
-
+    <h2>Alumnos</h2>
+    <div class="form-group">
+        <label>NOMBRE COMPLETO</label>
+        <input type="text" id="nombre">
+    </div>
+    <div class="form-group">
+        <label>MATRÍCULA</label>
+        <input type="text" id="matricula">
+    </div>
+    <div class="form-group">
+        <label>CORREO ELECTRÓNICO</label>
+        <input type="email" id="correo">
+    </div>
+    <button class="btn-save" onclick="guardarAlumno()">Registrar Alumno</button>
 </aside>
 
-<main class="main-content">
-
-<h1>Lista de Alumnos</h1>
-
-<br>
-
-<table>
-
-<thead>
-<tr>
-<th>ID</th>
-<th>Nombre</th>
-<th>Matrícula</th>
-<th>Correo</th>
-<th>Acciones</th>
-</tr>
-</thead>
-
-<tbody id="tablaAlumnos"></tbody>
-
-</table>
-
+<main>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Matrícula</th>
+                <th>Correo</th>
+            </tr>
+        </thead>
+        <tbody id="tablaAlumnos"></tbody>
+    </table>
 </main>
 
 <script>
+    // Cargar datos al iniciar
+    window.onload = cargarAlumnos;
 
-async function cargarAlumnos(){
+    async function cargarAlumnos(){
+        const response = await fetch("../backend/alumnos.php");
+        const data = await response.json();
+        
+        const tabla = document.getElementById("tablaAlumnos");
+        tabla.innerHTML = "";
 
-const response = await fetch("../backend/alumnos.php")
-const data = await response.json()
+        data.forEach(alumno => {
+            tabla.innerHTML += `
+            <tr>
+                <td>${alumno.id_alumno}</td>
+                <td>${alumno.nombre}</td>
+                <td>${alumno.matricula}</td>
+                <td>${alumno.correo}</td>
+                <td>
+                    <button class="btn-delete" onclick="eliminarAlumno(${alumno.id_alumno})">Eliminar</button>
+                </td>
+            </tr>
+            `;
+        });
+    }
 
-const tabla = document.getElementById("tablaAlumnos")
-tabla.innerHTML=""
+    async function guardarAlumno(){
+        const nombre = document.getElementById("nombre").value;
+        const matricula = document.getElementById("matricula").value;
+        const correo = document.getElementById("correo").value;
 
-data.forEach(alumno =>{
+        if(!nombre || !matricula) return alert("Nombre y matrícula son obligatorios");
 
-tabla.innerHTML+=`
-<tr>
+        const formData = new FormData();
+        formData.append("nombre", nombre);
+        formData.append("matricula", matricula);
+        formData.append("correo", correo);
 
-<td>${alumno.id_alumno}</td>
-<td>${alumno.nombre}</td>
-<td>${alumno.matricula}</td>
-<td>${alumno.correo}</td>
+        const response = await fetch("../backend/alumnos.php", {
+            method: "POST",
+            body: formData
+        });
 
-<td>
-<button class="btn-delete" onclick="eliminarAlumno(${alumno.id_alumno})">Eliminar</button>
-</td>
+        const res = await response.json();
+        if(res.status === "success") {
+            limpiar();
+            cargarAlumnos();
+        }
+    }
 
-</tr>
-`
+    async function eliminarAlumno(id){
+        if(confirm("¿Seguro que deseas eliminar este alumno?")){
+            await fetch(`../backend/alumnos.php?id=${id}`, { method: "DELETE" });
+            cargarAlumnos();
+        }
+    }
 
-})
-
-}
-
-async function guardarAlumno(){
-
-const nombre = document.getElementById("nombre").value
-const matricula = document.getElementById("matricula").value
-const correo = document.getElementById("correo").value
-
-const formData = new FormData()
-
-formData.append("nombre",nombre)
-formData.append("matricula",matricula)
-formData.append("correo",correo)
-
-await fetch("../backend/alumnos.php",{
-method:"POST",
-body:formData
-})
-
-limpiar()
-cargarAlumnos()
-
-}
-
-async function eliminarAlumno(id){
-
-if(confirm("¿Eliminar alumno?")){
-
-await fetch("../backend/alumnos.php?id="+id,{
-method:"DELETE"
-})
-
-cargarAlumnos()
-
-}
-
-}
-
-function limpiar(){
-
-document.getElementById("nombre").value=""
-document.getElementById("matricula").value=""
-document.getElementById("correo").value=""
-
-}
-
-cargarAlumnos()
-
+    function limpiar(){
+        document.getElementById("nombre").value = "";
+        document.getElementById("matricula").value = "";
+        document.getElementById("correo").value = "";
+    }
 </script>
 
 </body>

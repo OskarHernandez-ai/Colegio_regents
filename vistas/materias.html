@@ -8,8 +8,8 @@
     
     <style>
         :root {
-            --primary: #581c87; /* Púrpura oscuro profesional */
-            --accent: #a855f7;  /* Violeta para materias */
+            --primary: #581c87;
+            --accent: #a855f7;
             --bg: #f9fafb;
             --card: #ffffff;
             --text-main: #111827;
@@ -31,7 +31,6 @@
             min-height: 100vh;
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: 340px;
             background: var(--card);
@@ -39,16 +38,12 @@
             padding: 40px 25px;
             position: fixed;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.01);
         }
 
         .sidebar h2 {
             font-size: 1.4rem;
             margin-bottom: 30px;
             color: var(--primary);
-            letter-spacing: -0.025em;
         }
 
         .form-group {
@@ -71,7 +66,6 @@
             border-radius: 12px;
             font-size: 0.95rem;
             background: #fdfdff;
-            transition: all 0.2s;
         }
 
         input:focus {
@@ -88,15 +82,13 @@
             border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            width: 100%;
         }
 
         .btn-save:hover {
             background: #4c1d95;
-            transform: translateY(-1px);
         }
 
-        /* MAIN CONTENT */
         .main-content {
             margin-left: 340px;
             flex: 1;
@@ -116,18 +108,17 @@
             font-size: 0.9rem;
             padding: 8px 16px;
             border-radius: 8px;
-            transition: background 0.2s;
         }
 
-        .btn-back:hover { background: #f3f4f6; color: var(--text-main); }
+        .btn-back:hover {
+            background: #f3f4f6;
+        }
 
-        /* TABLA MODERNA */
         .table-card {
             background: var(--card);
             border-radius: 20px;
             border: 1px solid var(--border);
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
         table {
@@ -175,7 +166,6 @@
             font-weight: 600;
         }
 
-        /* ACCIONES */
         .btn-action {
             padding: 7px 14px;
             border-radius: 8px;
@@ -185,15 +175,30 @@
             font-weight: 600;
             cursor: pointer;
             margin-right: 5px;
-            transition: all 0.2s;
         }
 
-        .edit:hover { background: #f5f3ff; color: var(--primary); border-color: #ddd6fe; }
-        .delete:hover { background: #fff1f2; color: #e11d48; border-color: #fecdd3; }
+        .edit:hover {
+            background: #f5f3ff;
+            color: var(--primary);
+        }
+        
+        .delete:hover {
+            background: #fff1f2;
+            color: #e11d48;
+        }
+
+        #edit-tag {
+            display: none;
+            color: var(--accent);
+            font-size: 12px;
+            margin-top: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
 
         @media (max-width: 900px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; position: relative; height: auto; border-right: none; }
+            .sidebar { width: 100%; position: relative; height: auto; }
             .main-content { margin-left: 0; padding: 30px 20px; }
         }
     </style>
@@ -206,13 +211,11 @@
         
         <div class="form-group">
             <label>Nombre de la Asignatura</label>
-            <input id="nombre_materia" placeholder="Ej. Programación Web II">
+            <input id="nombre_materia">
         </div>
 
         <button class="btn-save" onclick="guardarMateria()">Registrar Materia</button>
-        <p id="edit-tag" style="display:none; color: var(--accent); font-size: 12px; margin-top: 15px; font-weight: 600;">
-            ✨ Editando materia seleccionada
-        </p>
+        <p id="edit-tag">Editando materia seleccionada</p>
     </aside>
 
     <main class="main-content">
@@ -231,18 +234,23 @@
                     </tr>
                 </thead>
                 <tbody id="tablaMaterias">
-                    </tbody>
+                    <!-- Se cargan las materias -->
+                </tbody>
             </table>
         </div>
     </main>
 
     <script>
+        // URL del archivo conectado a la base de datos (php)
+        const API_URL = "../backend/materias.php";
+        
         let editando = false;
         let idEditar = null;
 
+        // Función para CARGAR materias
         async function cargarMaterias(){
             try {
-                const response = await fetch("http://localhost:3000/materias");
+                const response = await fetch(API_URL);
                 const data = await response.json();
                 const tabla = document.getElementById("tablaMaterias");
                 tabla.innerHTML = "";
@@ -253,37 +261,58 @@
                         <td><span class="id-pill">#${materia.id_materia}</span></td>
                         <td><div class="subject-name">${materia.nombre_materia}</div></td>
                         <td>
-                            <button class="btn-action edit" onclick="editarMateria(${materia.id_materia},'${materia.nombre_materia}')">Editar</button>
+                            <button class="btn-action edit" onclick="editarMateria(${materia.id_materia}, '${materia.nombre_materia.replace(/'/g, "\\'")}')">Editar</button>
                             <button class="btn-action delete" onclick="eliminarMateria(${materia.id_materia})">Borrar</button>
                         </td>
                     </tr>
                     `;
                 });
-            } catch (e) { console.error("Error cargando materias", e); }
+            } catch (e) { 
+                console.error("Error cargando materias", e);
+                alert("Error al cargar las materias");
+            }
         }
 
+        // Función para GUARDAR (nueva o editar)
         async function guardarMateria(){
             const nombre_materia = document.getElementById("nombre_materia").value;
-            if(!nombre_materia) return alert("Escribe el nombre de la materia");
+            
+            if(!nombre_materia) {
+                alert("Escribe el nombre de la materia");
+                return;
+            }
 
-            const url = editando ? `http://localhost:3000/materias/${idEditar}` : "http://localhost:3000/materias";
+            // Si está editando, usa PUT con ID, si no, usa POST
+            const url = editando ? `${API_URL}?id=${idEditar}` : API_URL;
             const method = editando ? "PUT" : "POST";
 
-            await fetch(url, {
-                method: method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nombre_materia })
-            });
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nombre_materia: nombre_materia })
+                });
 
-            editando = false;
-            idEditar = null;
-            document.getElementById("form-title").innerText = "Nueva Materia";
-            document.getElementById("edit-tag").style.display = "none";
-            
-            limpiar();
-            cargarMaterias();
+                const result = await response.json();
+                
+                if(result.success) {
+                    // Resetear formulario
+                    editando = false;
+                    idEditar = null;
+                    document.getElementById("form-title").innerText = "Nueva Materia";
+                    document.getElementById("edit-tag").style.display = "none";
+                    
+                    limpiar();
+                    cargarMaterias();
+                } else {
+                    alert("Error: " + result.error);
+                }
+            } catch (error) {
+                alert("Error de conexión: " + error);
+            }
         }
 
+        // Función para edit
         function editarMateria(id, nombre){
             document.getElementById("nombre_materia").value = nombre;
             editando = true;
@@ -293,18 +322,34 @@
             document.getElementById("nombre_materia").focus();
         }
 
+        // Función para delete 
         async function eliminarMateria(id){
             if(confirm("¿Seguro que deseas eliminar esta materia?")) {
-                await fetch(`http://localhost:3000/materias/${id}`, { method: "DELETE" });
-                cargarMaterias();
+                try {
+                    const response = await fetch(`${API_URL}?id=${id}`, { 
+                        method: "DELETE" 
+                    });
+                    const result = await response.json();
+                    
+                    if(result.success) {
+                        cargarMaterias();
+                    } else {
+                        alert("Error: " + result.error);
+                    }
+                } catch (error) {
+                    alert("Error de conexión: " + error);
+                }
             }
         }
 
+        // Función para limpiar el formulario
         function limpiar(){
             document.getElementById("nombre_materia").value = "";
         }
 
+        // Cargar materias al iniciar la página
         cargarMaterias();
     </script>
+
 </body>
 </html>

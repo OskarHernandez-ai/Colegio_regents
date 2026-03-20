@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prueba Simple de Grupos</title>
+</head>
+<body>
+    <h2>🔧 PRUEBA DE GRUPOS - VERSIÓN SIMPLE</h2>
+    
+    <div style="margin: 20px;">
+        <input type="text" id="nombre" placeholder="Nombre del grupo" value="3°A">
+        <input type="text" id="cuatri" placeholder="Cuatrimestre" value="2026-1">
+        <button onclick="guardar()">GUARDAR GRUPO</button>
+    </div>
+    
+    <div style="margin: 20px;">
+        <button onclick="cargar()">CARGAR GRUPOS</button>
+    </div>
+    
+    <div id="resultado" style="margin: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9;">
+        Aquí verás el resultado...
+    </div>
+
+    <script>
+        const API_URL = "../backend/grupos.php";
+
+        async function guardar() {
+            const nombre = document.getElementById("nombre").value;
+            const cuatri = document.getElementById("cuatri").value;
+            
+            document.getElementById("resultado").innerHTML = "⏳ Enviando datos...";
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        nombre_grupo: nombre, 
+                        cuatrimestre: cuatri 
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById("resultado").innerHTML = 
+                    "<pre style='background:#e8f5e9; padding:10px;'>✅ RESPUESTA RECIBIDA:\n" + 
+                    JSON.stringify(data, null, 2) + "</pre>";
+                
+                console.log("Respuesta:", data);
+                
+            } catch (error) {
+                document.getElementById("resultado").innerHTML = 
+                    "<pre style='background:#ffebee; padding:10px;'>❌ ERROR:\n" + error + "</pre>";
+                console.error("Error:", error);
+            }
+        }
+
+        async function cargar() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                document.getElementById("resultado").innerHTML = 
+                    "<pre style='background:#e3f2fd; padding:10px;'>📋 GRUPOS:\n" + 
+                    JSON.stringify(data, null, 2) + "</pre>";
+            } catch (error) {
+                document.getElementById("resultado").innerHTML = "❌ Error: " + error;
+            }
+        }
+    </script>
+</body>
+</html>

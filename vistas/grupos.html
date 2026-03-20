@@ -8,8 +8,8 @@
     
     <style>
         :root {
-            --primary: #0369a1; /* Azul océano profundo */
-            --accent: #0ea5e9;  /* Azul brillante para grupos */
+            --primary: #0369a1;
+            --accent: #0ea5e9;
             --bg: #f8fafc;
             --card: #ffffff;
             --text-main: #0f172a;
@@ -31,7 +31,6 @@
             min-height: 100vh;
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: 340px;
             background: var(--card);
@@ -98,7 +97,6 @@
             transform: translateY(-1px);
         }
 
-        /* MAIN CONTENT */
         .main-content {
             margin-left: 340px;
             flex: 1;
@@ -124,7 +122,6 @@
 
         .btn-back:hover { background: #f1f5f9; color: var(--text-main); }
 
-        /* TABLA */
         .table-card {
             background: var(--card);
             border-radius: 20px;
@@ -171,7 +168,6 @@
             font-weight: 500;
         }
 
-        /* ACCIONES */
         .actions-flex {
             display: flex;
             gap: 10px;
@@ -200,18 +196,17 @@
 </head>
 
 <body>
-
     <aside class="sidebar">
         <h2 id="form-title">Registrar Grupo</h2>
         
         <div class="form-group">
-            <label>Identificador del Grupo</label>
-            <input id="nombre_grupo" placeholder="Ej. TI-71D">
+            <label>Nombre del grupo</label>
+            <input id="nombre_grupo">
         </div>
 
         <div class="form-group">
             <label>Periodo / Cuatrimestre</label>
-            <input id="cuatrimestre" placeholder="Ej. 7mo Cuatrimestre">
+            <input id="cuatrimestre">
         </div>
 
         <button class="btn-save" onclick="guardarGrupo()">Guardar Cambios</button>
@@ -236,22 +231,30 @@
                         <th width="180">Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="tablaGrupos">
-                    </tbody>
+                <tbody id="tablaGrupos"></tbody>
             </table>
         </div>
     </main>
 
     <script>
+        // ✅ Constante con la URL correcta del backend
+        const API_URL = "../backend/grupos.php";
+        
         let editando = false;
         let idEditar = null;
 
+        // Función para CARGAR grupos
         async function cargarGrupos(){
             try {
-                const response = await fetch("http://localhost:3000/grupos");
+                const response = await fetch(API_URL);
                 const data = await response.json();
                 const tabla = document.getElementById("tablaGrupos");
                 tabla.innerHTML = "";
+
+                if (data.length === 0) {
+                    tabla.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">No hay grupos registrados</td></tr>';
+                    return;
+                }
 
                 data.forEach(grupo => {
                     tabla.innerHTML += `
@@ -261,40 +264,61 @@
                         <td><span class="cuatri-text">${grupo.cuatrimestre}</span></td>
                         <td>
                             <div class="actions-flex">
-                                <button class="btn-action edit" onclick="editarGrupo(${grupo.id_grupo},'${grupo.nombre_grupo}','${grupo.cuatrimestre}')">Editar</button>
+                                <button class="btn-action edit" onclick="editarGrupo(${grupo.id_grupo}, '${grupo.nombre_grupo.replace(/'/g, "\\'")}', '${grupo.cuatrimestre.replace(/'/g, "\\'")}')">Editar</button>
                                 <button class="btn-action delete" onclick="eliminarGrupo(${grupo.id_grupo})">Borrar</button>
                             </div>
                         </td>
                     </tr>
                     `;
                 });
-            } catch (error) { console.error("Error:", error); }
+            } catch (error) { 
+                console.error("Error al cargar:", error);
+                alert("Error al cargar los grupos");
+            }
         }
 
+        // Función para GUARDAR (nuevo o editar)
         async function guardarGrupo(){
-            const nombre_grupo = document.getElementById("nombre_grupo").value;
-            const cuatrimestre = document.getElementById("cuatrimestre").value;
+            const nombre_grupo = document.getElementById("nombre_grupo").value.trim();
+            const cuatrimestre = document.getElementById("cuatrimestre").value.trim();
 
-            if(!nombre_grupo || !cuatrimestre) return alert("Completa todos los campos");
+            if(!nombre_grupo || !cuatrimestre) {
+                alert("Completa todos los campos");
+                return;
+            }
 
-            const url = editando ? `http://localhost:3000/grupos/${idEditar}` : "http://localhost:3000/grupos";
+            // ✅ Construir URL y método correctamente
+            const url = editando ? `${API_URL}?id=${idEditar}` : API_URL;
             const method = editando ? "PUT" : "POST";
 
-            await fetch(url, {
-                method: method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nombre_grupo, cuatrimestre })
-            });
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nombre_grupo, cuatrimestre })
+                });
 
-            editando = false;
-            idEditar = null;
-            document.getElementById("form-title").innerText = "Registrar Grupo";
-            document.getElementById("edit-notice").style.display = "none";
-            
-            limpiar();
-            cargarGrupos();
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Resetear formulario
+                    editando = false;
+                    idEditar = null;
+                    document.getElementById("form-title").innerText = "Registrar Grupo";
+                    document.getElementById("edit-notice").style.display = "none";
+                    
+                    limpiar();
+                    cargarGrupos();
+                } else {
+                    alert("Error: " + result.error);
+                }
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Error de conexión");
+            }
         }
 
+        // Función para EDITAR (prepara el formulario)
         function editarGrupo(id, nombre, cuatri){
             document.getElementById("nombre_grupo").value = nombre;
             document.getElementById("cuatrimestre").value = cuatri;
@@ -306,10 +330,24 @@
             document.getElementById("nombre_grupo").focus();
         }
 
+        // Función para ELIMINAR
         async function eliminarGrupo(id){
             if(confirm("¿Deseas dar de baja este grupo?")) {
-                await fetch(`http://localhost:3000/grupos/${id}`, { method: "DELETE" });
-                cargarGrupos();
+                try {
+                    const response = await fetch(`${API_URL}?id=${id}`, { 
+                        method: "DELETE" 
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        cargarGrupos();
+                    } else {
+                        alert("Error: " + result.error);
+                    }
+                } catch (error) {
+                    console.error("Error al eliminar:", error);
+                    alert("Error de conexión");
+                }
             }
         }
 
@@ -318,6 +356,7 @@
             document.getElementById("cuatrimestre").value = "";
         }
 
+        // Cargar grupos al iniciar
         cargarGrupos();
     </script>
 </body>

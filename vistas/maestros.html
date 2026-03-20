@@ -3,347 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Maestros | Panel de Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <title>Gestión de Maestros | Panel</title>
     <style>
-        :root {
-            --primary: #0f172a; /* Azul muy oscuro/negro profesional */
-            --accent: #10b981;  /* Verde esmeralda para maestros */
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+        :root{
+            --primary:#0f172a;
+            --accent:#10b981;
+            --bg:#f8fafc;
+            --text-main:#1e293b;
+            --text-muted:#64748b;
+            --border:#e2e8f0;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR (Panel de Registro) */
-        .sidebar {
-            width: 350px;
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            padding: 40px 25px;
-            position: fixed;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.02);
-        }
-
-        .sidebar h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 30px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-            background: #fcfcfc;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: white;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
-        }
-
-        .btn-save {
-            width: 100%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            margin-top: 10px;
-        }
-
-        .btn-save:hover {
-            background: #1e293b;
-            transform: translateY(-1px);
-        }
-
-        /* CONTENIDO PRINCIPAL */
-        .main-content {
-            margin-left: 350px;
-            flex: 1;
-            padding: 50px 60px;
-        }
-
-        .header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .btn-back {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-
-        .btn-back:hover {
-            background: #f1f5f9;
-            color: var(--primary);
-        }
-
-        /* TABLA ESTILO APP */
-        .table-container {
-            background: var(--card);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background: #f8fafc;
-            padding: 16px 24px;
-            text-align: left;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9rem;
-        }
-
-        tr:last-child td { border-bottom: none; }
-
-        .teacher-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .teacher-name {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .teacher-email {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .badge-id {
-            background: #f1f5f9;
-            color: var(--text-muted);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-
-        /* ACCIONES */
-        .actions-cell {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-action {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: white;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .edit:hover { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
-        .delete:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
-
-        @media (max-width: 900px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; position: relative; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-            .main-content { margin-left: 0; padding: 30px 20px; }
-        }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+        body{background:var(--bg);display:flex;min-height:100vh;}
+        .sidebar{width:350px;background:white;padding:40px;border-right:1px solid var(--border);position:fixed;height:100%;}
+        .form-group{margin-bottom:15px;}
+        label{font-size:12px;font-weight:bold;color:var(--text-muted);}
+        input{width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;margin-top:5px;}
+        .btn-save{width:100%;padding:12px;border:none;background:var(--primary);color:white;border-radius:6px;cursor:pointer;margin-top:10px;}
+        .main-content{margin-left:350px;padding:40px;flex:1;}
+        .search{margin-bottom:20px;padding:10px;width:300px;border-radius:6px;border:1px solid var(--border);}
+        table{width:100%;border-collapse:collapse;background:white;}
+        th{background:#f1f5f9;padding:14px;text-align:left;font-size:13px;}
+        td{padding:14px;border-bottom:1px solid var(--border);}
+        .btn-edit{background:#22c55e;color:white;padding:6px 10px;border:none;border-radius:6px;cursor:pointer;margin-right:5px;}
+        .btn-delete{background:#ef4444;color:white;padding:6px 10px;border:none;border-radius:6px;cursor:pointer;}
     </style>
 </head>
-
 <body>
-
-    <aside class="sidebar">
-        <h2 id="form-title">Registrar Maestro</h2>
-        
-        <div class="form-group">
-            <label>Nombre Completo</label>
-            <input id="nombre" placeholder="Ej. Dr. Armando Casas">
-        </div>
-
-        <div class="form-group">
-            <label>Correo Electrónico</label>
-            <input id="correo" type="email" placeholder="maestro@universidad.com">
-        </div>
-
-        <button class="btn-save" onclick="guardarMaestro()">Guardar Maestro</button>
-        <p id="edit-indicator" style="display:none; color: var(--accent); font-size: 12px; margin-top: 15px; font-weight: 600;">
-            ● Estás editando un registro
-        </p>
-    </aside>
-
-    <main class="main-content">
-        <header class="header-flex">
-            <h1>Plantilla Docente</h1>
-            <a href="dashboard.html" class="btn-back">← Volver al inicio</a>
-        </header>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="80">ID</th>
-                        <th>Maestro / Contacto</th>
-                        <th width="150">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaMaestros">
-                    </tbody>
-            </table>
-        </div>
-    </main>
-
-
-    <script>
-        let editando = false;
-        let idEditar = null;
-
-        async function cargarMaestros(){
-            try {
-                const response = await fetch("http://localhost:3000/maestros");
-                const data = await response.json();
-                const tabla = document.getElementById("tablaMaestros");
-                tabla.innerHTML = "";
-
-                data.forEach(maestro => {
-                    tabla.innerHTML += `
-                    <tr>
-                        <td><span class="badge-id">#${maestro.id_maestro}</span></td>
-                        <td>
-                            <div class="teacher-info">
-                                <span class="teacher-name">${maestro.nombre}</span>
-                                <span class="teacher-email">${maestro.correo}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="actions-cell">
-                                <button class="btn-action edit" onclick="editarMaestro(${maestro.id_maestro},'${maestro.nombre}','${maestro.correo}')">Editar</button>
-                                <button class="btn-action delete" onclick="eliminarMaestro(${maestro.id_maestro})">Eliminar</button>
-                            </div>
-                        </td>
-                    </tr>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error al cargar datos:", error);
-            }
-        }
-
-        async function guardarMaestro(){
-            const nombre = document.getElementById("nombre").value;
-            const correo = document.getElementById("correo").value;
-
-            if(!nombre || !correo) return alert("Por favor, completa todos los campos.");
-
-            const url = editando ? `http://localhost:3000/maestros/${idEditar}` : "http://localhost:3000/maestros";
-            const method = editando ? "PUT" : "POST";
-
-            await fetch(url, {
-                method: method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nombre, correo })
-            });
-
-            // Resetear estado
-            editando = false;
-            idEditar = null;
-            document.getElementById("form-title").innerText = "Registrar Maestro";
-            document.getElementById("edit-indicator").style.display = "none";
-            
-            limpiar();
-            cargarMaestros();
-        }
-
-        function editarMaestro(id, nombre, correo){
-            document.getElementById("nombre").value = nombre;
-            document.getElementById("correo").value = correo;
-
-            editando = true;
-            idEditar = id;
-            document.getElementById("form-title").innerText = "Editar Maestro";
-            document.getElementById("edit-indicator").style.display = "block";
-            document.getElementById("nombre").focus();
-        }
-
-        async function eliminarMaestro(id){
-            if(!confirm("¿Estás seguro de eliminar a este maestro?")) return;
-            await fetch(`http://localhost:3000/maestros/${id}`, { method: "DELETE" });
-            cargarMaestros();
-        }
-
-        function limpiar(){
-            document.getElementById("nombre").value = "";
-            document.getElementById("correo").value = "";
-        }
-
+ 
+<aside class="sidebar">
+    <h2 id="titulo">Registrar Maestro</h2>
+    <div class="form-group">
+        <label>Nombre</label>
+        <input id="nombre" type="text">
+    </div>
+    <div class="form-group">
+        <label>Correo</label>
+        <input id="correo" type="email">
+    </div>
+    <div class="form-group">
+        <label>ID Usuario</label>
+        <input id="id_usuario" type="number" value="1">
+    </div>
+    <button class="btn-save" onclick="guardarMaestro()">Guardar</button>
+</aside>
+ 
+<main class="main-content">
+    <h1>Plantilla Docente</h1>
+    <input class="search" id="buscador" placeholder="Buscar maestro..." onkeyup="filtrar()">
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Usuario ID</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="tablaMaestros"></tbody>
+    </table>
+</main>
+ 
+<script>
+const API = "../backend/maestros.php";
+let maestros = [];
+let editando = false;
+let idEditar = null;
+ 
+async function cargarMaestros() {
+    const res = await fetch(API);
+    maestros = await res.json();
+    mostrar(maestros);
+}
+ 
+function mostrar(lista) {
+    const tabla = document.getElementById("tablaMaestros");
+    tabla.innerHTML = lista.map(m => `
+        <tr>
+            <td>${m.id_maestro}</td>
+            <td>${m.nombre}</td>
+            <td>${m.correo}</td>
+            <td>${m.id_usuario}</td>
+            <td>
+                <button class="btn-edit" onclick="editar(${m.id_maestro},'${m.nombre}','${m.correo}',${m.id_usuario})">Editar</button>
+                <button class="btn-delete" onclick="eliminar(${m.id_maestro})">Eliminar</button>
+            </td>
+        </tr>
+    `).join('');
+}
+ 
+async function guardarMaestro() {
+    const nombre = document.getElementById("nombre").value.trim();
+    const correo = document.getElementById("correo").value.trim();
+    const id_usuario = document.getElementById("id_usuario").value;
+   
+    if(!nombre || !correo) return alert("Complete los campos");
+ 
+    const f = new FormData();
+    f.append("nombre", nombre);
+    f.append("correo", correo);
+    f.append("id_usuario", id_usuario);
+ 
+    if(editando){
+        f.append("id", idEditar);
+        f.append("accion", "editar");
+    } else {
+        f.append("accion", "guardar");
+    }
+ 
+    await fetch(API, { method: "POST", body: f });
+    limpiar();
+    cargarMaestros();
+}
+ 
+function editar(id, nombre, correo, id_user){
+    editando = true;
+    idEditar = id;
+    document.getElementById("nombre").value = nombre;
+    document.getElementById("correo").value = correo;
+    document.getElementById("id_usuario").value = id_user;
+    document.getElementById("titulo").innerText = "Editar Maestro";
+}
+ 
+async function eliminar(id){
+    if(confirm("¿Eliminar maestro?")){
+        await fetch(API+"?id="+id, { method: "DELETE" });
         cargarMaestros();
-    </script>
-
+    }
+}
+ 
+function limpiar(){
+    editando = false;
+    idEditar = null;
+    document.getElementById("nombre").value = "";
+    document.getElementById("correo").value = "";
+    document.getElementById("titulo").innerText = "Registrar Maestro";
+}
+ 
+function filtrar(){
+    const texto = document.getElementById("buscador").value.toLowerCase();
+    const filtrados = maestros.filter(m => m.nombre.toLowerCase().includes(texto) || m.correo.toLowerCase().includes(texto));
+    mostrar(filtrados);
+}
+ 
+cargarMaestros();
+</script>
 </body>
 </html>
